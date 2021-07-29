@@ -1,18 +1,29 @@
 from datetime import date
 
-
-HOUSE_TYPE = 0             # 양도할 물건 종류 (주택으로 고정)
-NUMBER_HOUSES = 0          # 주택 수. 1주택, 2주택, 3주택 이상
-BASIC_DEDUCTION_FLAG = 0   # 연간 기본공제 여부 (인당 250만원)
-SHARE_FLAG = 0             # 공동명의 여부
-SHARE_RATE = 0             # 공동명의일시 지분비율
-AREA_FLAG = 0              # 취득시점 조정대상지역 여부. 1주택일시 취득시점, 다주택일시 양도시점에서 판단.
-BUY_PRICE = 0              # 취득가액
-BUY_DATE = 0               # 취득일자
-SELL_PRICE = 0             # 양도가액
-SELL_DATE = 0              # 양도일자
-PERIOD_RESIDENCE = 0       # 실거주 기간. 연단위 입력
-REQUIRED_COST = 0          # 소요경비
+# 양도할 물건 종류 (주택으로 고정)
+HOUSE_TYPE = 0
+# 주택 수. 1주택, 2주택, 3주택 이상
+NUMBER_HOUSES = 1
+# 연간 기본공제 여부 (인당 250만원)
+BASIC_DEDUCTION_FLAG = 0
+# 공동명의 여부
+SHARE_FLAG = 0
+# 공동명의일시 지분비율
+SHARE_RATE = 0
+# 조정대상지역 여부. 1주택일시 취득시점, 다주택일시 양도시점에서 판단.
+AREA_FLAG = 0
+# 취득가액
+BUY_PRICE = 800000000
+# 취득일자
+BUY_DATE = date.fromisoformat("2006-05-07")
+# 양도가액
+SELL_PRICE = 1200000000
+# 양도일자
+SELL_DATE = date.fromisoformat("2020-02-07")
+# 실거주 기간. 연단위 입력
+PERIOD_RESIDENCE = 10
+# 소요경비
+REQUIRED_COST = 30000000
 
 TAX_FREE_FLAG = 0          # 비과세 여부
 YANDO_GAIN = 0             # 양도차익
@@ -25,6 +36,7 @@ if __name__ == "__main__":
     print("양도소득세 계산기")
 
     # 계산에 필요한 정보 입력.
+    '''
     NUMBER_HOUSES = int(input("주택 수 입력 : "))
     BASIC_DEDUCTION_FLAG = int(input("기본공제 여부 : "))
     SHARE_FLAG = int(input("공동명의 여부 : "))
@@ -40,6 +52,7 @@ if __name__ == "__main__":
     SELL_DATE = date.fromisoformat(input("양도일자 (YYYY-MM-DD) : "))
     PERIOD_RESIDENCE = int(input("실거주 기간 (연 단위) : "))
     REQUIRED_COST = int(input("소요경비 : "))
+    '''
 
     # 0. 비과세 요건 판단 (1주택 한정)
     if NUMBER_HOUSES == 1:  # 1주택이면
@@ -68,23 +81,23 @@ if __name__ == "__main__":
 
     # 1. 양도차익 산출 (양도가액 - (취득가액 + 필요경비))
     YANDO_GAIN = SELL_PRICE - (BUY_PRICE + REQUIRED_COST)  # 양도차익
-    print("양도차익 : " + str(YANDO_GAIN))
     # 공동명의라면 지분만큼
     if SHARE_FLAG == 1:
         YANDO_GAIN *= SHARE_RATE
     # 1주택이면서 양도가액 9억원 초과, 2년 이상 보유했다면
-    if AREA_FLAG == 1:  # 조정대상지역이면
-        # 1주택이면서 양도가액 9억원 초과, 2년 이상 보유 및 거주했다면
-        if BUY_DATE < date.fromisoformat("2017-08-02"):
-            if NUMBER_HOUSES == 1 and SELL_PRICE > 900000000 and (SELL_DATE - BUY_DATE).days >= 730:
-                YANDO_GAIN = YANDO_GAIN * (SELL_PRICE - 900000000) / SELL_PRICE  # 과세대상 양도차익 적용
-        else:
-            if NUMBER_HOUSES == 1 and SELL_PRICE > 900000000 and (SELL_DATE - BUY_DATE).days >= 730 and PERIOD_RESIDENCE >= 2:
-                YANDO_GAIN = YANDO_GAIN * (SELL_PRICE - 900000000) / SELL_PRICE  # 과세대상 양도차익 적용
-    else:  # 조정대상지역이 아니면
+    if BUY_DATE < date.fromisoformat("2017-08-02"):
         # 1주택이면서 양도가액 9억원 초과, 2년 이상 보유했다면
         if NUMBER_HOUSES == 1 and SELL_PRICE > 900000000 and (SELL_DATE - BUY_DATE).days >= 730:
             YANDO_GAIN = YANDO_GAIN * (SELL_PRICE - 900000000) / SELL_PRICE  # 과세대상 양도차익 적용
+    else:
+        if AREA_FLAG == 1:
+            if NUMBER_HOUSES == 1 and SELL_PRICE > 900000000 and (SELL_DATE - BUY_DATE).days >= 730 and PERIOD_RESIDENCE >= 2:
+                YANDO_GAIN = YANDO_GAIN * (SELL_PRICE - 900000000) / SELL_PRICE  # 과세대상 양도차익 적용
+        else:
+            if NUMBER_HOUSES == 1 and SELL_PRICE > 900000000 and (SELL_DATE - BUY_DATE).days >= 730:
+                YANDO_GAIN = YANDO_GAIN * (SELL_PRICE - 900000000) / SELL_PRICE  # 과세대상 양도차익 적용
+
+    print("양도차익 : " + str(YANDO_GAIN))
 
     # 2. 장기보유특별공제
     PERIOD_HOLD = (SELL_DATE - BUY_DATE).days // 365
@@ -99,10 +112,11 @@ if __name__ == "__main__":
             HOLD_DISCOUNT_RATE = 0.02 * min(15, PERIOD_HOLD)
 
     YANDO_GAIN = YANDO_GAIN - (YANDO_GAIN * HOLD_DISCOUNT_RATE)
-    if BASIC_DEDUCTION_FLAG == 0:  # 기본공제를 받지 않았다면
-        YANDO_GAIN -= 2500000
 
     print("과세표준 : " + str(YANDO_GAIN))
+
+    if BASIC_DEDUCTION_FLAG == 0:  # 기본공제를 받지 않았다면
+        YANDO_GAIN -= 2500000
 
     # 3. 세율 계산
     if YANDO_GAIN <= 12000000:  # 1,200만원 이하라면
