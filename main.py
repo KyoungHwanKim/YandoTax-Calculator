@@ -29,7 +29,7 @@ if __name__ == "__main__":
     BASIC_DEDUCTION_FLAG = int(input("기본공제 여부 : "))
     SHARE_FLAG = int(input("공동명의 여부 : "))
     if SHARE_FLAG:
-        SHARE_RATE = int(input("지분 비율 : "))
+        SHARE_RATE = float(input("지분 비율 : "))
     if NUMBER_HOUSES == 1:
         AREA_FLAG = int(input("주택 취득시점 조정대상지역 여부 : "))
     elif NUMBER_HOUSES >= 2:
@@ -68,11 +68,17 @@ if __name__ == "__main__":
 
     # 1. 양도차익 산출 (양도가액 - (취득가액 + 필요경비))
     YANDO_GAIN = SELL_PRICE - (BUY_PRICE + REQUIRED_COST)  # 양도차익
+    if SHARE_FLAG == 1:
+        YANDO_GAIN *= SHARE_RATE
     # 1주택이면서 양도가액 9억원 초과, 2년 이상 보유했다면
     if AREA_FLAG == 1:  # 조정대상지역이면
         # 1주택이면서 양도가액 9억원 초과, 2년 이상 보유 및 거주했다면
-        if NUMBER_HOUSES == 1 and SELL_PRICE > 900000000 and (SELL_DATE - BUY_DATE).days >= 730 and PERIOD_RESIDENCE >= 2:
-            YANDO_GAIN = YANDO_GAIN * (SELL_PRICE - 900000000) / SELL_PRICE  # 과세대상 양도차익 적용
+        if BUY_DATE < date.fromisoformat("2017-08-02"):
+            if NUMBER_HOUSES == 1 and SELL_PRICE > 900000000 and (SELL_DATE - BUY_DATE).days >= 730:
+                YANDO_GAIN = YANDO_GAIN * (SELL_PRICE - 900000000) / SELL_PRICE  # 과세대상 양도차익 적용
+        else:
+            if NUMBER_HOUSES == 1 and SELL_PRICE > 900000000 and (SELL_DATE - BUY_DATE).days >= 730 and PERIOD_RESIDENCE >= 2:
+                YANDO_GAIN = YANDO_GAIN * (SELL_PRICE - 900000000) / SELL_PRICE  # 과세대상 양도차익 적용
     else:  # 조정대상지역이 아니면
         # 1주택이면서 양도가액 9억원 초과, 2년 이상 보유했다면
         if NUMBER_HOUSES == 1 and SELL_PRICE > 900000000 and (SELL_DATE - BUY_DATE).days >= 730:
