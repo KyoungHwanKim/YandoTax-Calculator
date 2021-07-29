@@ -13,15 +13,15 @@ SHARE_RATE = 0
 # 조정대상지역 여부. 1주택일시 취득시점, 다주택일시 양도시점에서 판단.
 AREA_FLAG = 0
 # 취득가액
-BUY_PRICE = 800000000
+BUY_PRICE = 100000000
 # 취득일자
-BUY_DATE = date.fromisoformat("2006-05-07")
+BUY_DATE = date.fromisoformat("2020-05-07")
 # 양도가액
-SELL_PRICE = 1200000000
+SELL_PRICE = 300000000
 # 양도일자
-SELL_DATE = date.fromisoformat("2020-02-07")
+SELL_DATE = date.fromisoformat("2021-06-07")
 # 실거주 기간. 연단위 입력
-PERIOD_RESIDENCE = 10
+PERIOD_RESIDENCE = 0
 # 소요경비
 REQUIRED_COST = 30000000
 
@@ -119,30 +119,37 @@ if __name__ == "__main__":
         YANDO_GAIN -= 2500000
 
     # 3. 세율 계산
-    if YANDO_GAIN <= 12000000:  # 1,200만원 이하라면
-        TAX_RATE = 0.06
+    if PERIOD_HOLD < 1:  # 보유 기간이 1년 미만이면
+        TAX_RATE = 0.7
         TAX_DISCOUNT = 0
-    elif YANDO_GAIN <= 46000000:  # 4,6000만원 이하라면
-        TAX_RATE = 0.15
-        TAX_DISCOUNT = 1080000
-    elif YANDO_GAIN <= 88000000:  # 8,800만원 이하라면
-        TAX_RATE = 0.24
-        TAX_DISCOUNT = 5220000
-    elif YANDO_GAIN <= 150000000:
-        TAX_RATE = 0.35
-        TAX_DISCOUNT = 14900000
-    elif YANDO_GAIN <= 300000000:
-        TAX_RATE = 0.38
-        TAX_DISCOUNT = 19400000
-    elif YANDO_GAIN <= 500000000:
-        TAX_RATE = 0.40
-        TAX_DISCOUNT = 25400000
-    elif YANDO_GAIN <= 1000000000:
-        TAX_RATE = 0.42
-        TAX_DISCOUNT = 35400000
+    elif PERIOD_HOLD < 2:
+        TAX_RATE = 0.6
+        TAX_DISCOUNT = 0
     else:
-        TAX_RATE = 0.45
-        TAX_DISCOUNT = 65400000
+        if YANDO_GAIN <= 12000000:  # 1,200만원 이하라면
+            TAX_RATE = 0.06
+            TAX_DISCOUNT = 0
+        elif YANDO_GAIN <= 46000000:  # 4,6000만원 이하라면
+            TAX_RATE = 0.15
+            TAX_DISCOUNT = 1080000
+        elif YANDO_GAIN <= 88000000:  # 8,800만원 이하라면
+            TAX_RATE = 0.24
+            TAX_DISCOUNT = 5220000
+        elif YANDO_GAIN <= 150000000:
+            TAX_RATE = 0.35
+            TAX_DISCOUNT = 14900000
+        elif YANDO_GAIN <= 300000000:
+            TAX_RATE = 0.38
+            TAX_DISCOUNT = 19400000
+        elif YANDO_GAIN <= 500000000:
+            TAX_RATE = 0.40
+            TAX_DISCOUNT = 25400000
+        elif YANDO_GAIN <= 1000000000:
+            TAX_RATE = 0.42
+            TAX_DISCOUNT = 35400000
+        else:
+            TAX_RATE = 0.45
+            TAX_DISCOUNT = 65400000
 
     YANDO_TAX = YANDO_GAIN * TAX_RATE - TAX_DISCOUNT
 
