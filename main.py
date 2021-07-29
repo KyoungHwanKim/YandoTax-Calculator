@@ -68,6 +68,8 @@ if __name__ == "__main__":
 
     # 1. 양도차익 산출 (양도가액 - (취득가액 + 필요경비))
     YANDO_GAIN = SELL_PRICE - (BUY_PRICE + REQUIRED_COST)  # 양도차익
+    print("양도차익 : " + str(YANDO_GAIN))
+    # 공동명의라면 지분만큼
     if SHARE_FLAG == 1:
         YANDO_GAIN *= SHARE_RATE
     # 1주택이면서 양도가액 9억원 초과, 2년 이상 보유했다면
@@ -89,7 +91,7 @@ if __name__ == "__main__":
 
     if SELL_PRICE > 900000000:  # 고가주택 판단. (고가주택 : 양도가액이 9억원을 초과하는 주택)
         if PERIOD_RESIDENCE < 2:  # 2년 미만 거주했다면
-            HOLD_DISCOUNT_RATE = 0.02 * PERIOD_HOLD
+            HOLD_DISCOUNT_RATE = 0.02 * PERIOD_HOLD if PERIOD_HOLD >= 3 else 0
         else:  # 2년 이상 거주했다면
             HOLD_DISCOUNT_RATE = 0.04 * min(10, PERIOD_RESIDENCE) + (0.04 * min(10, PERIOD_HOLD) if PERIOD_HOLD >= 3 else 0)
     else:  # 고가주택이 아니라면
@@ -99,6 +101,8 @@ if __name__ == "__main__":
     YANDO_GAIN = YANDO_GAIN - (YANDO_GAIN * HOLD_DISCOUNT_RATE)
     if BASIC_DEDUCTION_FLAG == 0:  # 기본공제를 받지 않았다면
         YANDO_GAIN -= 2500000
+
+    print("과세표준 : " + str(YANDO_GAIN))
 
     # 3. 세율 계산
     if YANDO_GAIN <= 12000000:  # 1,200만원 이하라면
