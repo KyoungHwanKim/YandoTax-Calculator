@@ -22,8 +22,7 @@ def getLongTermHoldingDiscount(SELL_PRICE, SELL_DATE, HOLD_PERIOD, RESIDENCE_PER
             else:  # 2년 이상 거주했다면
                 DISCOUNT_RATE = (min(10, RESIDENCE_PERIOD) + min(10, HOLD_PERIOD)) * 0.04 if HOLD_PERIOD >= 3 else 0
         else:  # 고가주택이 아니라면
-            if HOLD_PERIOD >= 3:  # 3년 이상 보유했다면
-                DISCOUNT_RATE = min(15, HOLD_PERIOD) * 0.02
+            DISCOUNT_RATE = min(15, HOLD_PERIOD) * 0.02 if HOLD_PERIOD >= 3 else 0
 
     return DISCOUNT_RATE
 
